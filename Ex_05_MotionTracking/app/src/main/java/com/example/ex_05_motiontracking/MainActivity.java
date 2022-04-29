@@ -6,12 +6,16 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.hardware.display.DisplayManager;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.TextView;
 
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.Camera;
@@ -23,23 +27,39 @@ import com.google.ar.core.Pose;
 import com.google.ar.core.Session;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
 
+import org.w3c.dom.Text;
+
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     Session mSession;
+
     GLSurfaceView mySurView;
+    TextView my_textView;
+
     MainRenderer mRenderer;
+
     Config mConfig;    // ARCore Session 설정정보를 받을 변수
 
     Float displayX, displayY;
+
     Boolean mTouched = false;
+
+    String ttt;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //타이틀 바 없애기
+        hideStatusBar();
+
         setContentView(R.layout.activity_main);
         mySurView = (GLSurfaceView) findViewById(R.id.glsurfaceview);
+        my_textView = (TextView) findViewById(R.id.my_textView);
 
         //MainAtivity의 화면 관리 매니저 --> 화면변화를 감지 :: 현재 시스템에서 서비스 지원
         DisplayManager displayManager = (DisplayManager) getSystemService(DISPLAY_SERVICE);
@@ -109,11 +129,14 @@ public class MainActivity extends AppCompatActivity {
                 // 사용이 끝난 포인트 자원해제
                 pointCloud.release();
 
+                int i = 0;
+
+                ttt = "";
+
                 /* 화면 터치시 작업 시작*/
                 if (mTouched){
                     List<HitResult> arr = frame.hitTest(displayX, displayY);
                     Log.d("preRender : " , "Touch!!" + arr);
-                    int i = 0;
                     for(HitResult hr : arr){
                         Pose pose = hr.getHitPose();
 
@@ -123,8 +146,27 @@ public class MainActivity extends AppCompatActivity {
                         float[] yy = pose.getYAxis();
                         float[] zz = pose.getZAxis();
 
+                        // pose.qx, qy, qz는 회전값에 대한 정보
+                        // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 는 좌표값에 대한 정보
+                        mRenderer.addPoint(pose.tx(), pose.ty(), pose.tz());
+                        // x축
+                        mRenderer.addLineX(xx, pose.tx(), pose.ty(), pose.tz());
+                        // y축
+                        mRenderer.addLineY(yy, pose.tx(), pose.ty(), pose.tz());
+                        // z축
+                        mRenderer.addLineZ(zz, pose.tx(), pose.ty(), pose.tz());
+
+                        Log.d("arr" + i + ":", arr.toString());
+                        ttt += pose.toString()+"/n";
                         i++;
                     }
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            my_textView.setText(ttt);
+                        }
+                    });
 
                     mTouched = false;
 
@@ -139,9 +181,12 @@ public class MainActivity extends AppCompatActivity {
                 float[] viewMatrix = new float[16];
 
                 camera.getProjectionMatrix(projMatrix, 0, 0.1f, 100.0f);
-                camera.getViewMatrix(viewMatrix, 0);
-                mRenderer.mPointCloud.updateMatrix(viewMatrix, projMatrix);
 
+                camera.getViewMatrix(viewMatrix, 0);
+
+//                mRenderer.mPointCloud.updateMatrix(viewMatrix, projMatrix);
+                mRenderer.updateViewMatrix(viewMatrix);
+                mRenderer.updateProjMatrix(projMatrix);
             }
         };
 
@@ -225,4 +270,13 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
+    void hideStatusBar(){
+
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
+        );
+    }
+
 }
