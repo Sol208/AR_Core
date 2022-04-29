@@ -1,11 +1,15 @@
 package com.example.ex_05_motiontracking;
 
+import android.graphics.Color;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.opengl.Matrix;
 import android.util.Log;
 
 import com.google.ar.core.Frame;
 import com.google.ar.core.Session;
+
+import java.util.Random;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -15,6 +19,7 @@ public class MainRenderer implements GLSurfaceView.Renderer {
     RendererCallBack myCallBack;
     CameraPreView mCamera;
     PointCloudRenderer mPointCloud;
+    Sphere sphere;
 
     //화면이 변환되었다면 true
     Boolean viewprotChanged;
@@ -30,6 +35,7 @@ public class MainRenderer implements GLSurfaceView.Renderer {
     MainRenderer(RendererCallBack myCallBack){
         mPointCloud = new PointCloudRenderer();
         mCamera = new CameraPreView();
+        sphere = new Sphere();
 
         this.myCallBack = myCallBack;
     }
@@ -42,6 +48,7 @@ public class MainRenderer implements GLSurfaceView.Renderer {
 
         mCamera.init();
         mPointCloud.init();
+        sphere.init();
     }
 
     @Override
@@ -68,6 +75,28 @@ public class MainRenderer implements GLSurfaceView.Renderer {
 
         //포인트클라우드 그리기
         mPointCloud.draw();
+
+        // 점 그리기
+        sphere.draw();
+
+        if(mLineX != null) {
+            if(!mLineX.isInited) {
+                mLineX.init();
+            }
+            mLineX.draw();
+        }
+        if(mLineY != null) {
+            if(!mLineY.isInited) {
+                mLineY.init();
+            }
+            mLineY.draw();
+        }
+        if(mLineZ != null) {
+            if(!mLineZ.isInited) {
+                mLineZ.init();
+            }
+            mLineZ.draw();
+        }
 
     }
 
@@ -97,4 +126,72 @@ public class MainRenderer implements GLSurfaceView.Renderer {
     }
 
 
+    void addPoint(float x, float y, float z){
+        float[] matrix = new float[16];
+        Matrix.setIdentityM(matrix, 0); // 매트릭스 값 초기화
+        Matrix.translateM(matrix, 0, x, y, z); // translate는 이동/ rotate는 회전
+
+        sphere.addNoCnt();
+
+        sphere.setmModelMatrix(matrix);
+        // System.arraycopy(matrix, 0, sphere.mModelMatrix, 0, 16);
+    }
+
+    Line mLineX, mLineY, mLineZ;
+
+    void addLineX(float[] pps, float x, float y, float z) {
+        mLineX = new Line(pps, x, y, z, Color.RED);
+
+        float[] matrix = new float[16];
+        Matrix.setIdentityM(matrix, 0); // 매트릭스 값 초기화
+        Matrix.translateM(matrix, 0, x, y, z);
+        mLineX.setmModelMatrix(matrix);
+    }
+
+    void addLineY(float[] pps, float x, float y, float z) {
+        mLineY = new Line(pps, x, y, z, Color.GREEN);
+
+        float[] matrix = new float[16];
+        Matrix.setIdentityM(matrix, 0); // 매트릭스 값 초기화
+        Matrix.translateM(matrix, 0, x, y, z);
+        mLineY.setmModelMatrix(matrix);
+    }
+
+    void addLineZ(float[] pps, float x, float y, float z) {
+        mLineZ = new Line(pps, x, y, z, Color.BLUE);
+
+        float[] matrix = new float[16];
+        Matrix.setIdentityM(matrix, 0); // 매트릭스 값 초기화
+        Matrix.translateM(matrix, 0, x, y, z);
+        mLineZ.setmModelMatrix(matrix);
+    }
+
+
+    void updateViewMatrix(float[] viewMatrix){
+        mPointCloud.updateViewMatrix(viewMatrix);
+        sphere.updateViewMatrix(viewMatrix);
+        if(mLineX !=null) {
+            mLineX.updateViewMatrix(viewMatrix);
+        }
+        if(mLineY !=null) {
+            mLineY.updateViewMatrix(viewMatrix);
+        }
+        if(mLineZ !=null) {
+            mLineZ.updateViewMatrix(viewMatrix);
+        }
+    }
+
+    void updateProjMatrix(float[] projMatrix) {
+        mPointCloud.updateProjMatrix(projMatrix);
+        sphere.updateProjMatrix(projMatrix);
+        if(mLineX !=null) {
+            mLineX.updateProjMatrix(projMatrix);
+        }
+        if(mLineY !=null) {
+            mLineY.updateProjMatrix(projMatrix);
+        }
+        if(mLineZ !=null) {
+            mLineZ.updateProjMatrix(projMatrix);
+        }
+    }
 }

@@ -157,10 +157,15 @@ public class PointCloudRenderer {
 //        frame.transformDisplayUvCoords(mTexCoords, mTextCoordsTransformed);
     }
 
-    void updateMatrix(float[] mViewMatrix, float[] mProjMatrix) {
+    void updateViewMatrix(float[] mViewMatrix) {
         // 배열 복제
         //               원본        시작위치   복사될 배열    복사배열 시작위치      개수
         System.arraycopy(mViewMatrix, 0, this.mViewMatrix, 0, 16);
+    }
+
+    void updateProjMatrix(float[] mProjMatrix) {
+        // 배열 복제
+        //               원본        시작위치   복사될 배열    복사배열 시작위치      개수
         System.arraycopy(mProjMatrix, 0, this.mProjMatrix, 0, 16);
     }
 
