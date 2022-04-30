@@ -1,10 +1,13 @@
 package com.example.ex_05_motiontracking;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
 
 import com.google.ar.core.Frame;
 import com.google.ar.core.Session;
@@ -24,6 +27,8 @@ public class MainRenderer implements GLSurfaceView.Renderer {
     //화면이 변환되었다면 true
     Boolean viewprotChanged;
 
+    float lineWeight;
+
     int width, height;
 
     interface RendererCallBack{
@@ -36,7 +41,6 @@ public class MainRenderer implements GLSurfaceView.Renderer {
         mPointCloud = new PointCloudRenderer();
         mCamera = new CameraPreView();
         sphere = new Sphere();
-
         this.myCallBack = myCallBack;
     }
 
@@ -83,19 +87,19 @@ public class MainRenderer implements GLSurfaceView.Renderer {
             if(!mLineX.isInited) {
                 mLineX.init();
             }
-            mLineX.draw();
+            mLineX.draw(lineWeight);
         }
         if(mLineY != null) {
             if(!mLineY.isInited) {
                 mLineY.init();
             }
-            mLineY.draw();
+            mLineY.draw(lineWeight);
         }
         if(mLineZ != null) {
             if(!mLineZ.isInited) {
                 mLineZ.init();
             }
-            mLineZ.draw();
+            mLineZ.draw(lineWeight);
         }
 
     }
@@ -125,13 +129,15 @@ public class MainRenderer implements GLSurfaceView.Renderer {
         mCamera.transformDisplayGeometry(frame);
     }
 
+    void sphereColor(float red, float green, float blue, float opacity){
+        sphere.colorSet(red, green, blue, opacity);
+        sphere.btnClickable = true;
+    }
 
     void addPoint(float x, float y, float z){
         float[] matrix = new float[16];
         Matrix.setIdentityM(matrix, 0); // 매트릭스 값 초기화
         Matrix.translateM(matrix, 0, x, y, z); // translate는 이동/ rotate는 회전
-
-        sphere.addNoCnt();
 
         sphere.setmModelMatrix(matrix);
         // System.arraycopy(matrix, 0, sphere.mModelMatrix, 0, 16);

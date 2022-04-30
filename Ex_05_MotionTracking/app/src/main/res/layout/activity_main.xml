@@ -35,7 +35,9 @@
                 android:id="@+id/seekBar"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:max="100"
+                android:min="10"/>
         </LinearLayout>
 
         <LinearLayout
@@ -48,34 +50,34 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:id="@+id/redBtn"
-                android:backgroundTint="@color/mRed"/>
+                android:background="@color/mRed"/>
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:id="@+id/greenBtn"
-                android:backgroundTint="@color/mGreen"/>
+                android:background="@color/mGreen"/>
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:id="@+id/blueBtn"
-                android:backgroundTint="@color/mBlue"/>
+                android:background="@color/mBlue"/>
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:id="@+id/yellowBtn"
-                android:backgroundTint="@color/mYellow"/>
+                android:background="@color/mYellow"/>
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/grayBtn"
-                android:backgroundTint="@color/mGray"/>
+                android:background="@color/mGray"/>
 
         </LinearLayout>
     </LinearLayout>

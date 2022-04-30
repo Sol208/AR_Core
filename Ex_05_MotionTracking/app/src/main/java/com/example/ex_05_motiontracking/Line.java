@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -100,8 +101,8 @@ public class Line {
     }
 
 
-    // 도형 그리기 --> MyGLRenderer.onDrawFrame() 에서 호출하여 그리기
-    void draw() {
+    // 도형 그리기 --> MainRenderer.onDrawFrame() 에서 호출하여 그리기
+    void draw(float lineWeight) {
         GLES20.glUseProgram(mProgram);
 
         // 점, 색 계산방식
@@ -130,7 +131,7 @@ public class Line {
         // GPU 활성화
         GLES20.glEnableVertexAttribArray(position);
         GLES20.glEnableVertexAttribArray(color);
-        GLES20.glLineWidth(10.0f); // 라인 두께
+        GLES20.glLineWidth(lineWeight); // 라인 두께
 
         // 그린다.
         //                        선으로 그린다.,       순서의 보유량,          순서 자료형,       순서 내용
@@ -139,6 +140,7 @@ public class Line {
 
         // GPU비활성화
         GLES20.glDisableVertexAttribArray(position);
+
     }
 
     void setmModelMatrix(float[] matrix){

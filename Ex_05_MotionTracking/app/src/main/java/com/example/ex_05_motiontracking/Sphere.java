@@ -2,6 +2,7 @@ package com.example.ex_05_motiontracking;
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
+import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -10,12 +11,6 @@ import java.nio.ShortBuffer;
 
 public class Sphere {
 
-    int currNO = 0;
-
-    void addNoCnt() {
-        currNO++;
-        currNO %= mColorsArr.length;
-    }
 
     // GPU를 이용하여 고속 계산 하여 화면 처리하기 위한 코드
     String vertexShaderCode =
@@ -38,14 +33,14 @@ public class Sphere {
     float[] mViewMatrix = new float[16];
     float[] mProjMatrix = new float[16];
 
-    // 랜덤 색상
-    float[] mColor = {0.2f, 0.5f, 0.8f, 1.0f};
-    float[][] mColorsArr = {
-            {0.2f, 0.5f, 0.8f, 1.0f},
+    float red = 0.2f;
+    float green = 0.5f;
+    float blue = 0.8f;
+    float opacity = 1.0f;
 
-    };
+    float[] mColor = {red, green, blue, opacity};
 
-
+    Boolean btnClickable = false;
 
     FloatBuffer mVertices;
     FloatBuffer mColors;
@@ -55,7 +50,6 @@ public class Sphere {
     final int POINT_COUNT = 20;
 
     public Sphere() {
-
         // 반지름(구 모양 점 정보)
         float radius = 0.05f;
 
@@ -79,7 +73,6 @@ public class Sphere {
             }
         }
 
-
         // 색상정보 : POINT_COUNT * POINT_COUNT * 4
         //              면(삼각형)갯수     *     (RGB)
         float[] colors = new float[POINT_COUNT * POINT_COUNT * 4];  // 4는 RGB
@@ -93,7 +86,6 @@ public class Sphere {
                 colors[4 * index + 3] = mColor[3];
             }
         }
-
 
         // 삼각형들 그리는 점의 순서 --> 수학 개념 필요
         int numIndices = 2 * (POINT_COUNT - 1) * POINT_COUNT;
@@ -133,9 +125,37 @@ public class Sphere {
         mIndices.position(0);
     }
 
+    void changeColor(){
+        float[] mColor = {red, green, blue, opacity};
+        // 색상정보 : POINT_COUNT * POINT_COUNT * 4
+        //              면(삼각형)갯수     *     (RGB)
+        float[] colors = new float[POINT_COUNT * POINT_COUNT * 4];  // 4는 RGB
+
+        for (int i = 0; i < POINT_COUNT; i++){
+            for (int j = 0; j < POINT_COUNT; j++){
+                int index = i * POINT_COUNT + j;
+                colors[4 * index + 0] = mColor[0];
+                colors[4 * index + 1] = mColor[1];
+                colors[4 * index + 2] = mColor[2];
+                colors[4 * index + 3] = mColor[3];
+            }
+        }
+
+        mColors = ByteBuffer.allocateDirect(colors.length * Float.SIZE / 4)
+                .order(ByteOrder.nativeOrder()).asFloatBuffer();
+        mColors.put(colors);
+        mColors.position(0);
+
+        int fShader = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);
+        GLES20.glShaderSource(fShader, fragmentShaderCode);
+        GLES20.glCompileShader(fShader);
+
+        GLES20.glAttachShader(mProgram, fShader);
+
+    }
+
     // 초기화
     void init(){
-
         // 점위치 계산식
         int vShader = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
         GLES20.glShaderSource(vShader, vertexShaderCode);
@@ -154,6 +174,11 @@ public class Sphere {
 
     // 도형 그리기 --> MyGLRenderer.onDrawFrame() 에서 호출하여 그리기
     void draw() {
+        if (btnClickable == true){
+            changeColor();
+            btnClickable = false;
+            Log.d("btnClickable ==========> ", "True!");
+        }
         GLES20.glUseProgram(mProgram);
 
         // 점, 색 계산방식
@@ -191,6 +216,13 @@ public class Sphere {
 
         // GPU비활성화
         GLES20.glDisableVertexAttribArray(position);
+    }
+
+    void colorSet(float red, float green, float blue, float opacity){
+        this.red = red;
+        this.green = green;
+        this.blue = blue;
+        this.opacity = opacity;
     }
 
     void setmModelMatrix(float[] matrix){

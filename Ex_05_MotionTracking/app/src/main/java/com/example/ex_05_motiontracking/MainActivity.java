@@ -6,6 +6,9 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RippleDrawable;
 import android.hardware.display.DisplayManager;
 import android.opengl.GLSurfaceView;
@@ -17,6 +20,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,6 +54,10 @@ public class MainActivity extends AppCompatActivity {
     String ttt;
 
     Button redBtn, greenBtn, blueBtn, yellowBtn, grayBtn;
+    SeekBar seekBar;
+
+    Pose pose;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,20 +74,88 @@ public class MainActivity extends AppCompatActivity {
         blueBtn = (Button) findViewById(R.id.blueBtn);
         yellowBtn = (Button) findViewById(R.id.yellowBtn);
         grayBtn = (Button) findViewById(R.id.grayBtn);
+        seekBar = (SeekBar) findViewById(R.id.seekBar);
 
+        // 선이 생기면 SeekBar도 생기도록
+        seekBar.setVisibility(View.GONE);
 
 
         redBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               RippleDrawable colorD = (RippleDrawable) redBtn.getBackground();
-                int[] colorS = colorD.getState();
-               Toast.makeText(MainActivity.this, colorS + "", Toast.LENGTH_SHORT).show();
+
+                // 버튼의 색상을 가져오는것에 실패하여 임의로 부여하여 전달했습니다..
+
+//                ColorDrawable colorD = (ColorDrawable) redBtn.getBackground();
+//                int color = colorD.getColor();
+//                Log.d("redBtn Color ==> " , color+""); // -65536이 뜸..?
+//                Toast.makeText(MainActivity.this, color+ "", Toast.LENGTH_SHORT).show();
+
+                mRenderer.sphereColor(1.0f, 0.0f, 0.0f, 1.0f);
+                mRenderer.addPoint(pose.tx(), pose.ty(), pose.tz());
+                Toast.makeText(MainActivity.this,"", Toast.LENGTH_SHORT).show();
+
             }
         });
 
+        greenBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mRenderer.sphereColor(0.0f, 1.0f, 0.0f, 1.0f);
+                mRenderer.addPoint(pose.tx(), pose.ty(), pose.tz());
+                Toast.makeText(MainActivity.this,"", Toast.LENGTH_SHORT).show();
 
+            }
+        });
 
+        blueBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mRenderer.sphereColor(0.0f, 0.0f, 1.0f, 1.0f);
+                mRenderer.addPoint(pose.tx(), pose.ty(), pose.tz());
+                Toast.makeText(MainActivity.this,"", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        yellowBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mRenderer.sphereColor(1.0f, 1.0f, 0.0f, 1.0f);
+                mRenderer.addPoint(pose.tx(), pose.ty(), pose.tz());
+                Toast.makeText(MainActivity.this,"", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        grayBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mRenderer.sphereColor(0.6f, 0.6f, 0.6f, 1.0f);
+                mRenderer.addPoint(pose.tx(), pose.ty(), pose.tz());
+                Toast.makeText(MainActivity.this,"", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                // Seekbar 가 변경 되면서 받아온 int 값을 float형으로 전달하여 라인을 다시 그리게 한다.
+                float lineWeight = progress;
+                mRenderer.lineWeight = lineWeight;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
 
 
@@ -162,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
                     List<HitResult> arr = frame.hitTest(displayX, displayY);
                     Log.d("preRender : " , "Touch!!" + arr);
                     for(HitResult hr : arr){
-                        Pose pose = hr.getHitPose();
+                        pose = hr.getHitPose();
 
                         // getXAxis = float[] 로 반환됨
                         // 축의 방향성을 알려줄 때 점이 세개가 필요하여 배열로 제공됨
@@ -189,6 +265,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             my_textView.setText(ttt);
+                            seekBar.setVisibility(View.VISIBLE);
                         }
                     });
 
