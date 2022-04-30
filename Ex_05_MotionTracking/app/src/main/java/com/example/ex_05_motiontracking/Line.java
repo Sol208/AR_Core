@@ -45,11 +45,11 @@ public class Line {
 
         float[] mColor = new float[] {
                 Color.red(color) / 255.f,
-                Color.green(color)/ 255.f,
+                Color.green(color) / 255.f,
                 Color.blue(color) / 255.f,
                 1.0f,
                 Color.red(color) / 255.f,
-                Color.green(color)/ 255.f,
+                Color.green(color) / 255.f,
                 Color.blue(color) / 255.f,
                 1.0f
         };

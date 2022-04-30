@@ -133,11 +133,6 @@ public class Sphere {
         mIndices.position(0);
     }
 
-
-    void aaa() {
-
-    }
-
     // 초기화
     void init(){
 

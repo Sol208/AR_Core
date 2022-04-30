@@ -7,18 +7,77 @@
     tools:context=".MainActivity">
 
     <android.opengl.GLSurfaceView
+        android:id="@+id/glsurfaceview"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/glsurfaceview"/>
+        android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/my_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:text="GPS Info"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="30dp">
+
+            <SeekBar
+                android:id="@+id/seekBar"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/redBtn"
+                android:backgroundTint="@color/mRed"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/greenBtn"
+                android:backgroundTint="@color/mGreen"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/blueBtn"
+                android:backgroundTint="@color/mBlue"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/yellowBtn"
+                android:backgroundTint="@color/mYellow"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/grayBtn"
+                android:backgroundTint="@color/mGray"/>
+
+        </LinearLayout>
+    </LinearLayout>
 
 </RelativeLayout>

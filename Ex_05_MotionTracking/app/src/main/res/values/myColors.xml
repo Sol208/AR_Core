@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="mRed">#ff0000</color>
+    <color name="mGreen">#00ff00</color>
+    <color name="mBlue">#0000ff</color>
+    <color name="mYellow">#ffff00</color>
+    <color name="mGray">#bebebe</color>
+
+</resources>

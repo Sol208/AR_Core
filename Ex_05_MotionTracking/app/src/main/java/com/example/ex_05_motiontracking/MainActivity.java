@@ -6,16 +6,19 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
+import android.graphics.drawable.RippleDrawable;
 import android.hardware.display.DisplayManager;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.Camera;
@@ -26,8 +29,6 @@ import com.google.ar.core.PointCloud;
 import com.google.ar.core.Pose;
 import com.google.ar.core.Session;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
-
-import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
     String ttt;
 
-
+    Button redBtn, greenBtn, blueBtn, yellowBtn, grayBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +61,29 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mySurView = (GLSurfaceView) findViewById(R.id.glsurfaceview);
         my_textView = (TextView) findViewById(R.id.my_textView);
+        redBtn = (Button) findViewById(R.id.redBtn);
+        greenBtn = (Button) findViewById(R.id.greenBtn);
+        blueBtn = (Button) findViewById(R.id.blueBtn);
+        yellowBtn = (Button) findViewById(R.id.yellowBtn);
+        grayBtn = (Button) findViewById(R.id.grayBtn);
+
+
+
+        redBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               RippleDrawable colorD = (RippleDrawable) redBtn.getBackground();
+                int[] colorS = colorD.getState();
+               Toast.makeText(MainActivity.this, colorS + "", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+
+
+
+
+
 
         //MainAtivity의 화면 관리 매니저 --> 화면변화를 감지 :: 현재 시스템에서 서비스 지원
         DisplayManager displayManager = (DisplayManager) getSystemService(DISPLAY_SERVICE);
@@ -202,7 +226,6 @@ public class MainActivity extends AppCompatActivity {
         // 랜더링 계속 호출
         mySurView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
     }
-
 
     @Override
     protected void onPause() {
