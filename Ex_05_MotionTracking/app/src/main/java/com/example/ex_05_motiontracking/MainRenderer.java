@@ -130,6 +130,7 @@ public class MainRenderer implements GLSurfaceView.Renderer {
     }
 
     void sphereColor(float red, float green, float blue, float opacity){
+        // MainActivity의 버튼 색상을 받아와 Sphere에 colorSet메서드로 넘겨줌
         sphere.colorSet(red, green, blue, opacity);
         sphere.btnClickable = true;
     }

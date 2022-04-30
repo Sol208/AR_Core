@@ -10,8 +10,6 @@ import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
 public class Sphere {
-
-
     // GPU를 이용하여 고속 계산 하여 화면 처리하기 위한 코드
     String vertexShaderCode =
             "attribute vec3 aPosition;" +
@@ -40,6 +38,7 @@ public class Sphere {
 
     float[] mColor = {red, green, blue, opacity};
 
+    // MainActivity에서 버튼에 대한 Click이벤트 발생 여부를 알려주는 플래그
     Boolean btnClickable = false;
 
     FloatBuffer mVertices;
@@ -174,8 +173,11 @@ public class Sphere {
 
     // 도형 그리기 --> MyGLRenderer.onDrawFrame() 에서 호출하여 그리기
     void draw() {
+        // 버튼클릭 여부를 알려주는 플래그가 true로 변경되면,
         if (btnClickable == true){
+            // RGB를 받아와 색상 부분만 다시 초기화 해준다.
             changeColor();
+            // 다시 false로 바꿔줌
             btnClickable = false;
             Log.d("btnClickable ==========> ", "True!");
         }
