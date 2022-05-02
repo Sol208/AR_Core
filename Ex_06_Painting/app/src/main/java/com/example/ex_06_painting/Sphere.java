@@ -39,7 +39,6 @@ public class Sphere {
     float[] mColor = {red, green, blue, opacity};
 
     // MainActivity에서 버튼에 대한 Click이벤트 발생 여부를 알려주는 플래그
-    Boolean btnClickable = false;
 
     FloatBuffer mVertices;
     FloatBuffer mColors;
@@ -124,35 +123,6 @@ public class Sphere {
         mIndices.position(0);
     }
 
-    void changeColor(){
-        float[] mColor = {red, green, blue, opacity};
-        // 색상정보 : POINT_COUNT * POINT_COUNT * 4
-        //              면(삼각형)갯수     *     (RGB)
-        float[] colors = new float[POINT_COUNT * POINT_COUNT * 4];  // 4는 RGB
-
-        for (int i = 0; i < POINT_COUNT; i++){
-            for (int j = 0; j < POINT_COUNT; j++){
-                int index = i * POINT_COUNT + j;
-                colors[4 * index + 0] = mColor[0];
-                colors[4 * index + 1] = mColor[1];
-                colors[4 * index + 2] = mColor[2];
-                colors[4 * index + 3] = mColor[3];
-            }
-        }
-
-        mColors = ByteBuffer.allocateDirect(colors.length * Float.SIZE / 4)
-                .order(ByteOrder.nativeOrder()).asFloatBuffer();
-        mColors.put(colors);
-        mColors.position(0);
-
-        int fShader = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);
-        GLES20.glShaderSource(fShader, fragmentShaderCode);
-        GLES20.glCompileShader(fShader);
-
-        GLES20.glAttachShader(mProgram, fShader);
-
-    }
-
     // 초기화
     void init(){
         // 점위치 계산식
@@ -173,14 +143,6 @@ public class Sphere {
 
     // 도형 그리기 --> MyGLRenderer.onDrawFrame() 에서 호출하여 그리기
     void draw() {
-        // 버튼클릭 여부를 알려주는 플래그가 true로 변경되면,
-        if (btnClickable == true){
-            // RGB를 받아와 색상 부분만 다시 초기화 해준다.
-            changeColor();
-            // 다시 false로 바꿔줌
-            btnClickable = false;
-            Log.d("btnClickable ==========> ", "True!");
-        }
         GLES20.glUseProgram(mProgram);
 
         // 점, 색 계산방식

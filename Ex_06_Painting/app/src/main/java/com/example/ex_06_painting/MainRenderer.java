@@ -89,13 +89,13 @@ public class MainRenderer implements GLSurfaceView.Renderer {
         // 점 그리기
 //        sphere.draw();
 
-//        if(mLineX != null) {
-//            if(!mLineX.isInited) {
-//                mLineX.init();
-//            }
-//            mLineX.draw(seekLine);
-//        }
-
+        if(currPath != null) {
+            if(!currPath.isInited) {
+                currPath.init();
+            }
+            currPath.update();
+            currPath.draw();
+        }
     }
 
     //화면 변환이 되었다는 것을 지시할 메소드 ==> MainActivity 에서 실행할 것이다.
@@ -168,6 +168,9 @@ public class MainRenderer implements GLSurfaceView.Renderer {
         mPointCloud.updateViewMatrix(viewMatrix);
 //        sphere.updateViewMatrix(viewMatrix);
 
+        if (currPath!=null){
+            currPath.updateViewMatrix(viewMatrix);
+        }
 
     }
 
