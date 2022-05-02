@@ -6,10 +6,6 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.RippleDrawable;
 import android.hardware.display.DisplayManager;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
@@ -22,7 +18,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.Camera;
@@ -89,12 +84,9 @@ public class MainActivity extends AppCompatActivity {
 //                ColorDrawable colorD = (ColorDrawable) redBtn.getBackground();
 //                int color = colorD.getColor();
 //                Log.d("redBtn Color ==> " , color+""); // -65536이 뜸..?
-//                Toast.makeText(MainActivity.this, color+ "", Toast.LENGTH_SHORT).show();
 
                 mRenderer.sphereColor(1.0f, 0.0f, 0.0f, 1.0f);
                 mRenderer.addPoint(pose.tx(), pose.ty(), pose.tz());
-                Toast.makeText(MainActivity.this,"", Toast.LENGTH_SHORT).show();
-
             }
         });
 
@@ -103,7 +95,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 mRenderer.sphereColor(0.0f, 1.0f, 0.0f, 1.0f);
                 mRenderer.addPoint(pose.tx(), pose.ty(), pose.tz());
-                Toast.makeText(MainActivity.this,"", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -113,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 mRenderer.sphereColor(0.0f, 0.0f, 1.0f, 1.0f);
                 mRenderer.addPoint(pose.tx(), pose.ty(), pose.tz());
-                Toast.makeText(MainActivity.this,"", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -123,7 +113,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 mRenderer.sphereColor(1.0f, 1.0f, 0.0f, 1.0f);
                 mRenderer.addPoint(pose.tx(), pose.ty(), pose.tz());
-                Toast.makeText(MainActivity.this,"", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -133,8 +122,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 mRenderer.sphereColor(0.6f, 0.6f, 0.6f, 1.0f);
                 mRenderer.addPoint(pose.tx(), pose.ty(), pose.tz());
-                Toast.makeText(MainActivity.this,"", Toast.LENGTH_SHORT).show();
-
             }
         });
 
@@ -156,10 +143,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-
-
-
 
         //MainAtivity의 화면 관리 매니저 --> 화면변화를 감지 :: 현재 시스템에서 서비스 지원
         DisplayManager displayManager = (DisplayManager) getSystemService(DISPLAY_SERVICE);
