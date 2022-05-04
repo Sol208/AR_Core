@@ -16,7 +16,8 @@ public class MainRenderer implements GLSurfaceView.Renderer {
     PointCloudRenderer mPointCloud;
     PlaneRenderer mPlane;
     Cube mCube;
-    ObjRenderer mObj;
+    PenguinRenderer mPenguin;
+    JetRenderer mJet;
     boolean mViewportChanged;
     int mViewPortWidth, mViewPortHeight;
     RenderCallback mRenderCallback;
@@ -27,7 +28,8 @@ public class MainRenderer implements GLSurfaceView.Renderer {
         mPointCloud = new PointCloudRenderer();
         mPlane = new PlaneRenderer(Color.BLUE, 0.7f);
         mCube = new Cube(0.3f, Color.CYAN, 0.8f);
-        mObj = new ObjRenderer(context, "Penguin.obj", "Penguin.png");
+        mPenguin = new PenguinRenderer(context, "Penguin.obj", "Penguin.png");
+        mJet = new JetRenderer(context,"jet.obj", "jet.jpg");
     }
 
     interface RenderCallback {
@@ -45,7 +47,8 @@ public class MainRenderer implements GLSurfaceView.Renderer {
         mPointCloud.init();
         mPlane.init();
         mCube.init();
-        mObj.init();
+        mPenguin.init();
+        mJet.init();
     }
 
     @Override
@@ -66,7 +69,8 @@ public class MainRenderer implements GLSurfaceView.Renderer {
         mPointCloud.draw();
         mPlane.draw();
         mCube.draw();
-        mObj.draw();
+        mPenguin.draw();
+        mJet.draw();
     }
 
     void updateSession(Session session, int displayRotation){
@@ -79,13 +83,15 @@ public class MainRenderer implements GLSurfaceView.Renderer {
         mPointCloud.updateProjMatrix(matrix);
         mPlane.setProjectionMatrix(matrix);
         mCube.setProjectionMatrix(matrix);
-        mObj.setProjectionMatrix(matrix);
+        mPenguin.setProjectionMatrix(matrix);
+        mJet.setProjectionMatrix(matrix);
     }
     void updateViewMatrix(float[] matrix){
         mPointCloud.updateViewMatrix(matrix);
         mPlane.setViewMatrix(matrix);
         mCube.setViewMatrix(matrix);
-        mObj.setViewMatrix(matrix);
+        mPenguin.setViewMatrix(matrix);
+        mJet.setViewMatrix(matrix);
     }
 
     int getTextureId(){

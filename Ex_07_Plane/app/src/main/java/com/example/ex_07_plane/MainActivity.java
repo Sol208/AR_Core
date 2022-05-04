@@ -6,14 +6,21 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.hardware.display.DisplayManager;
 import android.opengl.GLSurfaceView;
+import android.opengl.Matrix;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.google.ar.core.ArCoreApk;
@@ -21,6 +28,7 @@ import com.google.ar.core.Camera;
 import com.google.ar.core.Config;
 import com.google.ar.core.Frame;
 import com.google.ar.core.HitResult;
+import com.google.ar.core.LightEstimate;
 import com.google.ar.core.Plane;
 import com.google.ar.core.PointCloud;
 import com.google.ar.core.Pose;
@@ -40,9 +48,15 @@ public class MainActivity extends AppCompatActivity {
 
     Session mSession;
     Config mConfig;
+    Button redBtn, greenBtn, blueBtn, purpleBtn, yellowBtn;
 
     boolean mUserRequestInstall = true, mTouched = false;
     float mCurrentX, mCurrentY;
+    float[] colorSet = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
+    float lightIntensity = 1.0f;
+
+    float[] modelMatrix;
+    boolean threadFlag = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,15 +66,22 @@ public class MainActivity extends AppCompatActivity {
 
         mSurfaceView = (GLSurfaceView) findViewById(R.id.gl_surface_view);
         myTextView = (TextView) findViewById(R.id.myTextView);
+        redBtn = (Button) findViewById(R.id.redBtn);
+        greenBtn = (Button) findViewById(R.id.greenBtn);
+        blueBtn = (Button) findViewById(R.id.blueBtn);
+        purpleBtn = (Button) findViewById(R.id.purpleBtn);
+        yellowBtn = (Button) findViewById(R.id.yellowBtn);
 
         DisplayManager displayManager = (DisplayManager) getSystemService(DISPLAY_SERVICE);
-        if(displayManager != null) {
+        if (displayManager != null) {
             displayManager.registerDisplayListener(new DisplayManager.DisplayListener() {
                 @Override
-                public void onDisplayAdded(int i) {}
+                public void onDisplayAdded(int i) {
+                }
 
                 @Override
-                public void onDisplayRemoved(int i) {}
+                public void onDisplayRemoved(int i) {
+                }
 
                 @Override
                 public void onDisplayChanged(int i) {
@@ -70,6 +91,93 @@ public class MainActivity extends AppCompatActivity {
                 }
             }, null);
         }
+        ((SeekBar) findViewById(R.id.seekBar)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                mRenderer.mPenguin.setLightIntensity(progress / 100.0f);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
+        redBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int color = ((ColorDrawable) redBtn.getBackground()).getColor();
+                colorSet = new float[]{
+                        Color.red(color) / 255f,
+                        Color.green(color) / 255f,
+                        Color.blue(color) / 255f,
+                        1.0f
+                };
+                mRenderer.mPenguin.setColorCorrection(colorSet);
+            }
+        });
+
+        greenBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int color = ((ColorDrawable) greenBtn.getBackground()).getColor();
+                colorSet = new float[]{
+                        Color.red(color) / 255f,
+                        Color.green(color) / 255f,
+                        Color.blue(color) / 255f,
+                        1.0f
+                };
+                mRenderer.mPenguin.setColorCorrection(colorSet);
+            }
+        });
+
+        blueBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int color = ((ColorDrawable) blueBtn.getBackground()).getColor();
+                colorSet = new float[]{
+                        Color.red(color) / 255f,
+                        Color.green(color) / 255f,
+                        Color.blue(color) / 255f,
+                        1.0f
+                };
+                mRenderer.mPenguin.setColorCorrection(colorSet);
+            }
+        });
+
+        purpleBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int color = ((ColorDrawable) purpleBtn.getBackground()).getColor();
+                colorSet = new float[]{
+                        Color.red(color) / 255f,
+                        Color.green(color) / 255f,
+                        Color.blue(color) / 255f,
+                        1.0f
+                };
+                mRenderer.mPenguin.setColorCorrection(colorSet);
+            }
+        });
+
+        yellowBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int color = ((ColorDrawable) yellowBtn.getBackground()).getColor();
+                colorSet = new float[]{
+                        Color.red(color) / 255f,
+                        Color.green(color) / 255f,
+                        Color.blue(color) / 255f,
+                        1.0f
+                };
+                mRenderer.mPenguin.setColorCorrection(colorSet);
+            }
+        });
 
         mRenderer = new MainRenderer(this, new MainRenderer.RenderCallback() {
             @Override
@@ -99,25 +207,82 @@ public class MainActivity extends AppCompatActivity {
                 pointCloud.release();
 
                 // 터치 했다면
-                if (mTouched){
+                if (mTouched) {
+                    LightEstimate estimate = frame.getLightEstimate();
+                    // LightEstimate :: 빛에 대한 정보를 가지는 클래스
+                    // getPixelIntensity(); 빛의 강도 인지 (0 ~ 1.0)
+
+                    lightIntensity = estimate.getPixelIntensity();
+
+                    // 빛의 세기
                     List<HitResult> results = frame.hitTest(mCurrentX, mCurrentY);
 
-                    for (HitResult result : results){
+                    float[] colorCorrection = new float[4];
+
+                    // 빛의 색깔 가져오기
+                    estimate.getColorCorrection(colorCorrection, 0);
+
+                    for (HitResult result : results) {
                         Pose pose = result.getHitPose(); // 증강공간에서의 좌표
-                        float[] modelMatrix = new float[16];
+                        modelMatrix = new float[16];
+                        float[] jetMatrix = new float[16];
                         pose.toMatrix(modelMatrix, 0); // 좌표를 가지고 matrix화 함
+//                        pose.toMatrix(jetMatrix,0);
 
                         // 증강공간의 좌표에 객체가 있는지 받아온다.(Plane이 걸려 있는가)
                         Trackable trackable = result.getTrackable();
 
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                super.run();
+                                if (threadFlag) {
+                                    for (float i = (float) 1; i <= (float) 30; i++) {
+                                        Matrix.translateM(modelMatrix, 0, 0f, 0f, i / 10);
+                                        mRenderer.mPenguin.setModelMatrix(modelMatrix);
+                                        SystemClock.sleep(200);
+                                        Log.d("펭귄", i / 10 + "");
+                                        if (i == 30){
+                                            threadFlag = false;
+                                        }
+                                    }
+                                }
+                            }
+                        }.start();
+
+                        // 크기변경(비율)
+                        Matrix.scaleM(modelMatrix, 0, 0.5f, 0.5f, 0.5f);
+
+                        // 이동(거리)
+//                        Matrix.translateM(modelMatrix, 0, 0f, 2.0f, 6.0f);
+                        // 회전
+                        //                               옵셋    각도    축(0혹은 양수, 음수만 중요)
+                        Matrix.rotateM(modelMatrix, 0, 0, 0f, 34f, 0f);
+
+                        // 크기변경(비율)
+                        Matrix.scaleM(jetMatrix, 0, 0.08f, 0.08f, 0.08f);
+//                        // 이동(거리)
+                        Matrix.translateM(jetMatrix, 0, 0f, 0f, -0.5f);
+//                        // 회전
+//                        //                               옵셋    각도    축(0혹은 양수, 음수만 중요)
+//                        Matrix.rotateM(jetMatrix, 0, 0,0f, 34f, 0f);
+
+//                        Log.d("모델매트릭스", Arrays.toString(modelMatrix));
+
                         // 좌표에 걸린 객체가 Plane 인지 확인하는 if문
                         if (trackable instanceof Plane &&
-                            ((Plane)trackable).isPoseInPolygon(pose)){ // Plane 폴리곤(면)의 안에 좌표가 있는지 확인
+                                ((Plane) trackable).isPoseInPolygon(pose)) { // Plane 폴리곤(면)의 안에 좌표가 있는지 확인
 
+//                            mRenderer.mJet.setModelMatrix(jetMatrix);
+
+                            // 빛의 세기값을 넘긴다.
+                            mRenderer.mPenguin.setLightIntensity(lightIntensity);
+                            // ↓↓↓↓↓↓↓↓ 빛의 색을 magenta로 강제화 시킴
+                            // mRenderer.mObj.setColorCorrection(new float[]{1.0f, 0.0f, 1.0f,1.0f});
+                            mRenderer.mPenguin.setColorCorrection(colorSet);
+//                            mRenderer.mJet.setColorCorrection(colorSet);
                             // 큐브의 modelMatrix를 터치한 증강현실 modelMatrix로 설정
-//                            mRenderer.mCube.setModelMatrix(modelMatrix);
-                            mRenderer.mObj.setModelMatrix(modelMatrix);
-
+//                            mRenderer.mCube.setModelMatrix(cubeMatrix);
                         }
                     }
 
@@ -132,23 +297,23 @@ public class MainActivity extends AppCompatActivity {
                 boolean isPlaneDetected = false;
 
                 //plane이 정상이라면
-                for (Plane plane : planes){
+                for (Plane plane : planes) {
                     if (plane.getTrackingState() == TrackingState.TRACKING &&
-                    plane.getSubsumedBy() == null){
+                            plane.getSubsumedBy() == null) {
                         isPlaneDetected = true;
                         // 렌더링에서 plane 정보를 갱신하여 출력
                         mRenderer.mPlane.update(plane);
                     }
                 }
 
-                if (isPlaneDetected){
+                if (isPlaneDetected) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             myTextView.setText("평면을 찾았어요!");
                         }
                     });
-                } else{
+                } else {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -158,10 +323,10 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 Camera camera = frame.getCamera();
-                float [] projMatrix = new float[16];
+                float[] projMatrix = new float[16];
                 camera.getProjectionMatrix(projMatrix, 0, 0.1f, 100f);
 
-                float [] viewMatrix = new float[16];
+                float[] viewMatrix = new float[16];
                 camera.getViewMatrix(viewMatrix, 0);
 
                 mRenderer.setProjectionMatrix(projMatrix);
@@ -171,7 +336,7 @@ public class MainActivity extends AppCompatActivity {
 
         mSurfaceView.setPreserveEGLContextOnPause(true);
         mSurfaceView.setEGLContextClientVersion(2);
-        mSurfaceView.setEGLConfigChooser(8,8,8,8,16,0);
+        mSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
         mSurfaceView.setRenderer(mRenderer);
 
 
@@ -183,7 +348,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         requestCameraPermission();
         try {
-            if(mSession == null) {
+            if (mSession == null) {
                 switch (ArCoreApk.getInstance().requestInstall(this, true)) {
                     case INSTALLED:
                         mSession = new Session(this);
@@ -231,11 +396,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void requestCameraPermission() {
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(
                     this,
-                    new String[] {Manifest.permission.CAMERA},
+                    new String[]{Manifest.permission.CAMERA},
                     0
             );
         }
@@ -243,7 +408,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN){
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
             mTouched = true;
             mCurrentX = event.getX();
             mCurrentY = event.getY();
@@ -251,4 +416,17 @@ public class MainActivity extends AppCompatActivity {
         }
         return true;
     }
+
+//    public void btnClick(View view){
+//        int color = ((ColorDrawable)view.getBackground()).getColor();
+//        float[] colorSet = new float[]{
+//                Color.red(color)/255f,
+//                Color.green(color)/255f,
+//                Color.blue(color)/255f,
+//                1.0f
+//        };
+//        mRenderer.mObj.setColorCorrection(colorSet);
+//    }
+
+
 }
