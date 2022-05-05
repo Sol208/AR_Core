@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     float lightIntensity = 1.0f;
 
     float[] modelMatrix;
-    boolean threadFlag = true;
+    float[] jetMatrix;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -225,64 +225,49 @@ public class MainActivity extends AppCompatActivity {
                     for (HitResult result : results) {
                         Pose pose = result.getHitPose(); // 증강공간에서의 좌표
                         modelMatrix = new float[16];
-                        float[] jetMatrix = new float[16];
+                        jetMatrix = new float[16];
                         pose.toMatrix(modelMatrix, 0); // 좌표를 가지고 matrix화 함
-//                        pose.toMatrix(jetMatrix,0);
+                        pose.toMatrix(jetMatrix,0);
 
                         // 증강공간의 좌표에 객체가 있는지 받아온다.(Plane이 걸려 있는가)
                         Trackable trackable = result.getTrackable();
 
-                        new Thread() {
-                            @Override
-                            public void run() {
-                                super.run();
-                                if (threadFlag) {
-                                    for (float i = (float) 1; i <= (float) 30; i++) {
-                                        Matrix.translateM(modelMatrix, 0, 0f, 0f, i / 10);
-                                        mRenderer.mPenguin.setModelMatrix(modelMatrix);
-                                        SystemClock.sleep(200);
-                                        Log.d("펭귄", i / 10 + "");
-                                        if (i == 30){
-                                            threadFlag = false;
-                                        }
-                                    }
-                                }
-                            }
-                        }.start();
-
                         // 크기변경(비율)
-                        Matrix.scaleM(modelMatrix, 0, 0.5f, 0.5f, 0.5f);
+                        Matrix.scaleM(modelMatrix, 0, 0.03f, 0.03f, 0.03f);
+                        Matrix.scaleM(jetMatrix, 0, 0.008f, 0.008f, 0.008f);
 
-                        // 이동(거리)
-//                        Matrix.translateM(modelMatrix, 0, 0f, 2.0f, 6.0f);
                         // 회전
                         //                               옵셋    각도    축(0혹은 양수, 음수만 중요)
-                        Matrix.rotateM(modelMatrix, 0, 0, 0f, 34f, 0f);
-
-                        // 크기변경(비율)
-                        Matrix.scaleM(jetMatrix, 0, 0.08f, 0.08f, 0.08f);
-//                        // 이동(거리)
-                        Matrix.translateM(jetMatrix, 0, 0f, 0f, -0.5f);
-//                        // 회전
-//                        //                               옵셋    각도    축(0혹은 양수, 음수만 중요)
-//                        Matrix.rotateM(jetMatrix, 0, 0,0f, 34f, 0f);
-
-//                        Log.d("모델매트릭스", Arrays.toString(modelMatrix));
+                        Matrix.rotateM(modelMatrix, 0, 90, 1f, 0f, 0f);
+                        Matrix.rotateM(jetMatrix, 0, 0,0f, 34f, 0f);
 
                         // 좌표에 걸린 객체가 Plane 인지 확인하는 if문
                         if (trackable instanceof Plane &&
                                 ((Plane) trackable).isPoseInPolygon(pose)) { // Plane 폴리곤(면)의 안에 좌표가 있는지 확인
-
-//                            mRenderer.mJet.setModelMatrix(jetMatrix);
 
                             // 빛의 세기값을 넘긴다.
                             mRenderer.mPenguin.setLightIntensity(lightIntensity);
                             // ↓↓↓↓↓↓↓↓ 빛의 색을 magenta로 강제화 시킴
                             // mRenderer.mObj.setColorCorrection(new float[]{1.0f, 0.0f, 1.0f,1.0f});
                             mRenderer.mPenguin.setColorCorrection(colorSet);
-//                            mRenderer.mJet.setColorCorrection(colorSet);
+                            mRenderer.mJet.setColorCorrection(colorSet);
                             // 큐브의 modelMatrix를 터치한 증강현실 modelMatrix로 설정
 //                            mRenderer.mCube.setModelMatrix(cubeMatrix);
+                            new Thread() {
+                                @Override
+                                public void run() {
+                                    super.run();
+                                    for (float i = (float) 1; i <= (float) 30; i++) {
+                                        // 이동
+                                        Matrix.translateM(modelMatrix, 0, 0, i / 10, 0f);
+                                        mRenderer.mPenguin.setModelMatrix(modelMatrix);
+                                        Matrix.translateM(jetMatrix, 0, 0f, 0f, (i / 10)*2);
+                                        mRenderer.mJet.setModelMatrix(jetMatrix);
+
+                                        SystemClock.sleep(50);
+                                    }
+                                }
+                            }.start();
                         }
                     }
 
