@@ -29,6 +29,7 @@ public class MainRenderer implements GLSurfaceView.Renderer {
         mObj = new ObjRenderer(context, "earth.obj", "earth.png");
         mObjs.add(new ObjRenderer(context, "earth.obj", "earth.png"));
         mObjs.add(new ObjRenderer(context, "moon.obj", "moon.png"));
+        mObjs.add(new ObjRenderer(context, "jet.obj", "jet.jpg"));
     }
 
     interface RenderCallback{

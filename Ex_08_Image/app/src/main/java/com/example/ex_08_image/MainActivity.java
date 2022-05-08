@@ -33,6 +33,7 @@ import com.google.ar.core.exceptions.CameraNotAvailableException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.Collection;
 
 public class MainActivity extends AppCompatActivity {
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     Session mSession;
     Config mConfig;
     Bitmap bitmap;
-    TextView search_image;
+    float i = 0.001f;
 
     boolean mUserRequestedInstall = true, mTouched = false;
 
@@ -54,7 +55,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mSurfaceView = (GLSurfaceView)findViewById(R.id.gl_surface_view);
-        search_image = (TextView) findViewById(R.id.search_image);
 
         DisplayManager displayManager = (DisplayManager) getSystemService(DISPLAY_SERVICE);
         if(displayManager != null){
@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
         try {
 
             // 파일스트림 로드
-            InputStream is = getAssets().open("1.png");
+            InputStream is = getAssets().open("sola_system.png");
             // 파일스트림에서 Bitmap 생성
             bitmap = BitmapFactory.decodeStream(is);
             // 이미지데이터베이스에 bitmap 추가
@@ -206,8 +206,10 @@ public class MainActivity extends AppCompatActivity {
 
                 float[] earthMatrix = new float[16];
                 float[] moonMatrix = new float[16];
+                float[] jetMatrix = new float[16];
                 imgPose.toMatrix(earthMatrix, 0);
                 imgPose.toMatrix(moonMatrix, 0);
+                imgPose.toMatrix(jetMatrix, 0);
 
                 Matrix.translateM(earthMatrix, 0, 0.1f, 0.0f, 0.0f);
                 Matrix.rotateM(earthMatrix, 0, 0, 1.0f, 0.0f, 0.0f);
@@ -217,24 +219,26 @@ public class MainActivity extends AppCompatActivity {
                 Matrix.rotateM(moonMatrix, 0, 0, 1.0f, 0.0f, 0.0f);
                 Matrix.scaleM(moonMatrix, 0, 0.03f, 0.03f, 0.03f);
 
-
                 mRenderer.mObjs.get(0).setModelMatrix(earthMatrix);
                 mRenderer.mObjs.get(1).setModelMatrix(moonMatrix);
-//                new Thread() {
-//                    @Override
-//                    public void run() {
-//                        super.run();
-//                        for (float i = 1.0f; i <= 30.0f; i++) {
-//                            Log.d("i Num = ", i/1000 + "");
-////                            Matrix.scaleM(earthMatrix, 0, i/1000, i/1000, i/1000);
-////                            Matrix.scaleM(moonMatrix, 0, i/1000, i/1000, i/1000);
-////
-////                            mRenderer.mObjs.get(0).setModelMatrix(earthMatrix);
-////                            mRenderer.mObjs.get(1).setModelMatrix(moonMatrix);
-//                            SystemClock.sleep(100);
-//                        }
-//                    }
-//                }.start();
+
+                new Thread() {
+                    @Override
+                    public void run() {
+                        super.run();
+                        if (i < 0.03f) {
+                            BigDecimal iNum = new BigDecimal(i+"");
+                            BigDecimal nNum = new BigDecimal("0.001");
+                            Log.d("i Num = ", i + "");
+                            Matrix.scaleM(jetMatrix, 0, i, i, i);
+                            Matrix.translateM(jetMatrix, 0, 0.0f, i*1000, 0.0f);
+                            Matrix.rotateM(jetMatrix, 0, -90, 1f, 0.0f, 0.0f);
+                            mRenderer.mObjs.get(2).setModelMatrix(jetMatrix);
+                            SystemClock.sleep(100);
+                            i = iNum.add(nNum).floatValue();;
+                        }
+                    }
+                }.start();
             }
 //                mRenderer.mObj.setModelMatrix(earthMatrix);
 
@@ -261,7 +265,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-
         mSurfaceView.onPause();
         mSession.pause();
     }
